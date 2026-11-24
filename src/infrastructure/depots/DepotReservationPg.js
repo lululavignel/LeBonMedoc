@@ -1,6 +1,7 @@
 import { connexions } from '../bdd/connexion.js';
+import { Reservation } from '../../domaine/reservation/Reservation.js';
 
-const COLONNES = 'id, client_id, pharmacie_id, statut, retrait_le, cree_le, mis_a_jour_le';
+const COLONNES = 'id, client_id, pharmacie_id, statut, retrait_le, expire_le, cree_le, mis_a_jour_le';
 const COLONNES_LIGNE = 'reservation_id, medicament_id, quantite';
 
 // La réservation est la racine de l'agrégat : ses lignes (lignes_reservation)
@@ -24,6 +25,25 @@ export class DepotReservationPg {
       [reservationId],
     );
     return lignes;
+  }
+
+  async getReservation(id) {
+    const { rows: lignes } = await connexions.query(
+      'SELECT id, statut, expire_le FROM reservations WHERE id = $1',
+      [id],
+    );
+    const ligne = lignes[0];
+    if (!ligne) return null;
+    return new Reservation({ id: ligne.id, statut: ligne.statut, expireLe: ligne.expire_le });
+  }
+
+  async miseAJourDeLetat(reservation) {
+    await connexions.query(
+      `UPDATE reservations
+       SET statut = $2, expire_le = $3, mis_a_jour_le = now()
+       WHERE id = $1`,
+      [reservation.id, reservation.statut, reservation.expireLe],
+    );
   }
 
   async creer({ clientId, pharmacieId, retraitLe = null, lignes }) {

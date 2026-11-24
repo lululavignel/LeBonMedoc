@@ -27,5 +27,9 @@ export function routeurReservations(serviceReservation) {
     reponse.status(201).json(reservation);
   });
 
+  routeur.post('/:id/acceptation', async (requete, reponse) => {
+    reponse.json(await serviceReservation.accepterReservation(lireId(requete)));
+  });
+
   return routeur;
 }

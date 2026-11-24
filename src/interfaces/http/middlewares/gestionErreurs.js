@@ -1,4 +1,5 @@
 import { ErreurApplication } from '../../../application/erreurs.js';
+import { ErreurDomaine } from '../../../domaine/erreurs.js';
 
 export function gestionnaireRouteIntrouvable(requete, reponse) {
   reponse.status(404).json({ erreur: `Route ${requete.method} ${requete.originalUrl} introuvable` });

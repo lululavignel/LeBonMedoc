@@ -67,6 +67,7 @@ CREATE TABLE reservations (
     pharmacie_id   INTEGER NOT NULL REFERENCES pharmacies(id),
     statut         statut_reservation NOT NULL DEFAULT 'EN_ATTENTE',
     retrait_le     TIMESTAMPTZ,
+    expire_le      TIMESTAMPTZ,
     cree_le        TIMESTAMPTZ NOT NULL DEFAULT now(),
     mis_a_jour_le  TIMESTAMPTZ NOT NULL DEFAULT now()
 );

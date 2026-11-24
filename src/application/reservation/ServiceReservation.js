@@ -20,6 +20,19 @@ export class ServiceReservation {
     return this.depotReservation.getLignes(id);
   }
 
+  async accepterReservation(id) {
+    const reservation = await this.#chargerReservation(id);
+    reservation.accepter(new Date());
+    await this.depotReservation.miseAJourDeLetat(reservation);
+    return this.obtenirReservationParId(id);
+  }
+
+  async #chargerReservation(id) {
+    const reservation = await this.depotReservation.getReservation(id);
+    if (!reservation) throw new ErreurIntrouvable(`Réservation ${id} introuvable`);
+    return reservation;
+  }
+
   creerReservation(donnees) {
     const manquants = ['clientId', 'pharmacieId', 'lignes'].filter((champ) => !donnees?.[champ]);
     if (manquants.length) {
