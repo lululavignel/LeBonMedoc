@@ -9,7 +9,7 @@
       "name": "Santé",
       "item": [
         {
-          "name": "Health check (API + base de données)",
+          "name": "Vérification de santé (API + base de données)",
           "event": [
             {
               "listen": "test",
@@ -18,7 +18,7 @@
                 "exec": [
                   "pm.test('Statut 200', () => pm.response.to.have.status(200));",
                   "pm.test('Base de données joignable', () => {",
-                  "  pm.expect(pm.response.json().database.status).to.eql('up');",
+                  "  pm.expect(pm.response.json().baseDeDonnees.statut).to.eql('disponible');",
                   "});"
                 ]
               }
@@ -28,8 +28,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/health",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{urlBase}}/api/health",
+              "host": ["{{urlBase}}"],
               "path": ["api", "health"]
             }
           }
@@ -57,8 +57,8 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/pharmacies",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{urlBase}}/api/pharmacies",
+              "host": ["{{urlBase}}"],
               "path": ["api", "pharmacies"]
             }
           }
@@ -72,7 +72,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Statut 201', () => pm.response.to.have.status(201));",
-                  "pm.environment.set('pharmacyId', pm.response.json().id);"
+                  "pm.environment.set('pharmacieId', pm.response.json().id);"
                 ]
               }
             }
@@ -82,12 +82,12 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Pharmacie du Peyrou\",\n  \"address\": \"5 rue Foch\",\n  \"city\": \"Montpellier\",\n  \"postalCode\": \"34000\",\n  \"phone\": \"0400000003\",\n  \"openingHours\": { \"mon\": [\"09:00\", \"19:00\"] }\n}",
+              "raw": "{\n  \"nom\": \"Pharmacie du Peyrou\",\n  \"adresse\": \"5 rue Foch\",\n  \"ville\": \"Montpellier\",\n  \"codePostal\": \"34000\",\n  \"telephone\": \"0400000003\",\n  \"horairesOuverture\": { \"lun\": [\"09:00\", \"19:00\"] }\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {
-              "raw": "{{baseUrl}}/api/pharmacies",
-              "host": ["{{baseUrl}}"],
+              "raw": "{{urlBase}}/api/pharmacies",
+              "host": ["{{urlBase}}"],
               "path": ["api", "pharmacies"]
             }
           }
@@ -109,9 +109,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/pharmacies/{{pharmacyId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "pharmacies", "{{pharmacyId}}"]
+              "raw": "{{urlBase}}/api/pharmacies/{{pharmacieId}}",
+              "host": ["{{urlBase}}"],
+              "path": ["api", "pharmacies", "{{pharmacieId}}"]
             }
           }
         }

@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "description": "LeBonMédoc - réservation de médicaments en pharmacies partenaires (atelier DDD)",
   "type": "module",
-  "main": "src/server.js",
+  "main": "src/serveur.js",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "start": "node --env-file-if-exists=.env src/server.js",
-    "dev": "node --watch --env-file-if-exists=.env src/server.js",
+    "start": "node --env-file-if-exists=.env src/serveur.js",
+    "dev": "node --watch --env-file-if-exists=.env src/serveur.js",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
     "db:reset": "docker compose down -v && docker compose up -d db",

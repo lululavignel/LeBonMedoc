@@ -34,9 +34,9 @@ Connexion directe à la base : `docker exec -it lebonmedoc-db psql -U lebonmedoc
 
 1. Postman → **Import** → sélectionner les deux fichiers de [`postman/`](postman/).
 2. Choisir l'environnement **LeBonMédoc - Local** en haut à droite.
-3. Lancer **Santé › Health check** : `database.status` doit valoir `up`.
+3. Lancer **Santé › Vérification de santé** : `baseDeDonnees.statut` doit valoir `disponible`.
 
-La requête « Créer une pharmacie » enregistre automatiquement l'id créé dans `{{pharmacyId}}`.
+La requête « Créer une pharmacie » enregistre automatiquement l'id créé dans `{{pharmacieId}}`.
 
 ## Endpoints
 
@@ -45,18 +45,18 @@ La requête « Créer une pharmacie » enregistre automatiquement l'id créé da
 | GET     | `/api/health`          | État de l'API et de la base         |
 | GET     | `/api/pharmacies`      | Liste des pharmacies                |
 | GET     | `/api/pharmacies/:id`  | Détail d'une pharmacie              |
-| POST    | `/api/pharmacies`      | Création (`name`, `address`, `city`, `postalCode` obligatoires) |
+| POST    | `/api/pharmacies`      | Création (`nom`, `adresse`, `ville`, `codePostal` obligatoires) |
 
 ## Architecture (couches DDD)
 
 ```
 src/
-├── domain/          # Cœur métier, sans dépendance technique (ex. états de réservation)
+├── domaine/         # Cœur métier, sans dépendance technique (ex. états de réservation)
 ├── application/     # Cas d'usage / services applicatifs, erreurs métier
-├── infrastructure/  # Accès Postgres (pool, repositories)
+├── infrastructure/  # Accès Postgres (connexions, dépôts)
 ├── interfaces/http/ # Routes Express, middlewares
 ├── app.js           # Composition des dépendances
-└── server.js        # Point d'entrée
+└── serveur.js       # Point d'entrée
 db/init/             # Schéma SQL + données de démo (exécutés au 1er lancement du conteneur)
 postman/             # Collection + environnement Postman
 ```
@@ -64,4 +64,4 @@ postman/             # Collection + environnement Postman
 Le schéma ([`db/init/01_schema.sql`](db/init/01_schema.sql)) reprend le premier modèle du domaine :
 pharmacies, pharmaciens, clients, médicaments, stocks, réservations (+ lignes) et administrateurs.
 Les statuts de réservation (`EN_ATTENTE → ACCEPTEE | REFUSEE`, `ACCEPTEE → TERMINEE | EXPIREE`)
-sont définis dans [`src/domain/reservation/ReservationStatus.js`](src/domain/reservation/ReservationStatus.js).
+sont définis dans [`src/domaine/reservation/StatutReservation.js`](src/domaine/reservation/StatutReservation.js).

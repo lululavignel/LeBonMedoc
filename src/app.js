@@ -1,22 +1,22 @@
 import express from 'express';
-import { healthRouter } from './interfaces/http/routes/health.routes.js';
-import { pharmacyRouter } from './interfaces/http/routes/pharmacy.routes.js';
-import { errorHandler, notFoundHandler } from './interfaces/http/middlewares/errorHandler.js';
-import { PgPharmacyRepository } from './infrastructure/repositories/PgPharmacyRepository.js';
-import { PharmacyService } from './application/pharmacy/PharmacyService.js';
+import { routeurSante } from './interfaces/http/routes/sante.routes.js';
+import { routeurPharmacies } from './interfaces/http/routes/pharmacies.routes.js';
+import { gestionnaireErreurs, gestionnaireRouteIntrouvable } from './interfaces/http/middlewares/gestionErreurs.js';
+import { DepotPharmaciePg } from './infrastructure/depots/DepotPharmaciePg.js';
+import { ServicePharmacie } from './application/pharmacie/ServicePharmacie.js';
 
-export function createApp() {
-  const app = express();
-  app.use(express.json());
+export function creerApplication() {
+  const application = express();
+  application.use(express.json());
 
   // Composition : infrastructure -> application -> interface HTTP
-  const pharmacyService = new PharmacyService(new PgPharmacyRepository());
+  const servicePharmacie = new ServicePharmacie(new DepotPharmaciePg());
 
-  app.get('/', (_req, res) => res.json({ name: 'LeBonMédoc API', version: '0.1.0' }));
-  app.use('/api/health', healthRouter);
-  app.use('/api/pharmacies', pharmacyRouter(pharmacyService));
+  application.get('/', (_requete, reponse) => reponse.json({ nom: 'LeBonMédoc API', version: '0.1.0' }));
+  application.use('/api/health', routeurSante);
+  application.use('/api/pharmacies', routeurPharmacies(servicePharmacie));
 
-  app.use(notFoundHandler);
-  app.use(errorHandler);
-  return app;
+  application.use(gestionnaireRouteIntrouvable);
+  application.use(gestionnaireErreurs);
+  return application;
 }
