@@ -3,12 +3,12 @@ import { connexions } from '../bdd/connexion.js';
 const COLONNES = 'id, nom, adresse, ville, code_postal, telephone, email, horaires_ouverture, est_partenaire, cree_le';
 
 export class DepotPharmaciePg {
-  async trouverToutes() {
+  async getAll() {
     const { rows: lignes } = await connexions.query(`SELECT ${COLONNES} FROM pharmacies ORDER BY id`);
     return lignes;
   }
 
-  async trouverParId(id) {
+  async getById(id) {
     const { rows: lignes } = await connexions.query(`SELECT ${COLONNES} FROM pharmacies WHERE id = $1`, [id]);
     return lignes[0] ?? null;
   }

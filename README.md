@@ -46,6 +46,27 @@ La requête « Créer une pharmacie » enregistre automatiquement l'id créé da
 | GET     | `/api/pharmacies`      | Liste des pharmacies                |
 | GET     | `/api/pharmacies/:id`  | Détail d'une pharmacie              |
 | POST    | `/api/pharmacies`      | Création (`nom`, `adresse`, `ville`, `codePostal` obligatoires) |
+| GET     | `/api/administrateurs`     | Liste des administrateurs       |
+| GET     | `/api/administrateurs/:id` | Détail d'un administrateur      |
+| POST    | `/api/administrateurs`     | Création (`nom`, `prenom`, `email` obligatoires) |
+| GET     | `/api/pharmaciens`         | Liste des pharmaciens           |
+| GET     | `/api/pharmaciens/:id`     | Détail d'un pharmacien          |
+| POST    | `/api/pharmaciens`         | Création (`pharmacieId`, `nom`, `prenom`, `email` obligatoires) |
+| GET     | `/api/clients`             | Liste des clients               |
+| GET     | `/api/clients/:id`         | Détail d'un client              |
+| POST    | `/api/clients`             | Création (`nom`, `prenom`, `numeroSecuriteSociale` (15 chiffres), `email` obligatoires) |
+| GET     | `/api/medicaments`         | Liste des médicaments           |
+| GET     | `/api/medicaments/:id`     | Détail d'un médicament          |
+| POST    | `/api/medicaments`         | Création (`nom` obligatoire, `categorie`, `necessiteOrdonnance`) |
+| GET     | `/api/stocks`              | Liste des stocks                |
+| GET     | `/api/stocks/:pharmacieId/:medicamentId` | Stock d'un médicament dans une pharmacie |
+| POST    | `/api/stocks`              | Création (`pharmacieId`, `medicamentId` obligatoires, `quantite`) |
+| GET     | `/api/reservations`        | Liste des réservations          |
+| GET     | `/api/reservations/:id`    | Détail d'une réservation, avec ses lignes |
+| GET     | `/api/reservations/:id/lignes` | Lignes (médicaments) d'une réservation |
+| POST    | `/api/reservations`        | Création (`clientId`, `pharmacieId`, `lignes: [{ medicamentId, quantite }]` ≥ 1 ligne, `retraitLe`) |
+
+Les violations de contraintes en base renvoient `409` (doublon, ex. email déjà utilisé) ou `400` (référence inexistante).
 
 ## Architecture (couches DDD)
 

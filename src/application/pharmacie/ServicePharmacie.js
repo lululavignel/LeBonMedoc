@@ -6,11 +6,11 @@ export class ServicePharmacie {
   }
 
   listerPharmacies() {
-    return this.depotPharmacie.trouverToutes();
+    return this.depotPharmacie.getAll();
   }
 
   async obtenirPharmacieParId(id) {
-    const pharmacie = await this.depotPharmacie.trouverParId(id);
+    const pharmacie = await this.depotPharmacie.getById(id);
     if (!pharmacie) throw new ErreurIntrouvable(`Pharmacie ${id} introuvable`);
     return pharmacie;
   }
@@ -22,4 +22,6 @@ export class ServicePharmacie {
     }
     return this.depotPharmacie.creer(donnees);
   }
+
+
 }
