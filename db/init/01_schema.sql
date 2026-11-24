@@ -1,6 +1,6 @@
 -- Schéma initial LeBonMédoc, dérivé du premier modèle du domaine
 
-CREATE TYPE statut_reservation AS ENUM ('EN_ATTENTE', 'ACCEPTEE', 'REFUSEE', 'TERMINEE', 'EXPIREE');
+CREATE TYPE statut_reservation AS ENUM ('EN_ATTENTE', 'ACCEPTEE', 'REFUSEE', 'ANNULEE', 'TERMINEE', 'EXPIREE');
 
 CREATE TABLE administrateurs (
     id          SERIAL PRIMARY KEY,
