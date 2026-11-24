@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "LeBonMédoc API",
+    "description": "Collection de requêtes pour l'API LeBonMédoc. Sélectionner l'environnement « LeBonMédoc - Local ».",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Santé",
+      "item": [
+        {
+          "name": "Health check (API + base de données)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Base de données joignable', () => {",
+                  "  pm.expect(pm.response.json().database.status).to.eql('up');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pharmacies",
+      "item": [
+        {
+          "name": "Lister les pharmacies",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Statut 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Retourne un tableau', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pharmacies",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pharmacies"]
+            }
+          }
+        },
+        {
+          "name": "Créer une pharmacie",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Statut 201', () => pm.response.to.have.status(201));",
+                  "pm.environment.set('pharmacyId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pharmacie du Peyrou\",\n  \"address\": \"5 rue Foch\",\n  \"city\": \"Montpellier\",\n  \"postalCode\": \"34000\",\n  \"phone\": \"0400000003\",\n  \"openingHours\": { \"mon\": [\"09:00\", \"19:00\"] }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pharmacies",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pharmacies"]
+            }
+          }
+        },
+        {
+          "name": "Obtenir une pharmacie",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Statut 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pharmacies/{{pharmacyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pharmacies", "{{pharmacyId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
