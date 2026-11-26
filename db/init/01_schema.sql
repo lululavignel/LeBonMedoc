@@ -20,7 +20,6 @@ CREATE TABLE pharmacies (
     telephone           VARCHAR(30),
     email               VARCHAR(255),
     horaires_ouverture  JSONB NOT NULL DEFAULT '{}'::jsonb, -- ex: {"lun": ["09:00","19:00"], ...}
-    est_partenaire      BOOLEAN NOT NULL DEFAULT true,
     cree_le             TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
