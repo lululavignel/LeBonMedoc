@@ -16,11 +16,13 @@ INSERT INTO pharmaciens (pharmacie_id, nom, prenom, email) VALUES
 INSERT INTO clients (nom, prenom, numero_securite_sociale, email) VALUES
     ('Dupont', 'Jean', '185073400000012', 'jean.dupont@example.test');
 
-INSERT INTO medicaments (nom, categorie, necessite_ordonnance) VALUES
-    ('Doliprane 1000mg', 'Antalgique', false),
-    ('Amoxicilline 500mg', 'Antibiotique', true),
-    ('Spasfon 80mg', 'Antispasmodique', false);
+-- Prix en centimes
+INSERT INTO medicaments (nom, prix_defaut, est_remboursable, categorie, necessite_ordonnance) VALUES
+    ('Doliprane 1000mg', 218, true, 'Antalgique', false),
+    ('Amoxicilline 500mg', 312, true, 'Antibiotique', true),
+    ('Spasfon 80mg', 450, false, 'Antispasmodique', false);
 
-INSERT INTO stocks (pharmacie_id, medicament_id, quantite) VALUES
-    (1, 1, 25), (1, 2, 0), (1, 3, 10),
-    (2, 1, 5),  (2, 2, 12);
+-- Remboursable : prix de vente = prix par défaut ; non remboursable (Spasfon) : prix libre
+INSERT INTO stocks (pharmacie_id, medicament_id, prix, quantite) VALUES
+    (1, 1, 218, 25), (1, 2, 312, 0), (1, 3, 495, 10),
+    (2, 1, 218, 5),  (2, 2, 312, 12);

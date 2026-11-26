@@ -53,7 +53,7 @@ CREATE TABLE medicaments (
     cree_le               TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Stock : quantité disponible d'un médicament dans une pharmacie et le prix défini par la pharmacie (médicaments non remboursables uniquement)
+-- Stock : quantité disponible d'un médicament dans une pharmacie et son prix de vente (égal au prix par défaut si le médicament est remboursable)
 CREATE TABLE stocks (
     pharmacie_id    INTEGER NOT NULL REFERENCES pharmacies(id) ON DELETE CASCADE,
     medicament_id   INTEGER NOT NULL REFERENCES medicaments(id) ON DELETE CASCADE,

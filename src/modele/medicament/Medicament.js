@@ -40,16 +40,14 @@ export class Medicament {
   get categorie() { return this.#categorie; }
   get necessiteOrdonnance() { return this.#necessiteOrdonnance; }
 
-  prixApplicable(prixPharmacie = null) {
-    if (prixPharmacie === null) {
-      return this.#prixDefaut;
+  verifierPrixVente(prixVente) {
+    if (!Number.isInteger(prixVente) || prixVente < 0) {
+      throw new ErreurMedicamentInvalide(`Prix de vente invalide : ${JSON.stringify(prixVente)}`);
     }
-    if (this.#estRemboursable) {
-      throw new ErreurMedicamentInvalide('Un médicament remboursable ne peut pas avoir de prix fixé par la pharmacie');
+    if (this.#estRemboursable && prixVente !== this.#prixDefaut) {
+      throw new ErreurMedicamentInvalide(
+        `Un médicament remboursable doit être vendu à son prix par défaut (${this.#prixDefaut}), pas ${prixVente}`,
+      );
     }
-    if (!Number.isInteger(prixPharmacie) || prixPharmacie < 0) {
-      throw new ErreurMedicamentInvalide(`Prix pharmacie invalide : ${JSON.stringify(prixPharmacie)}`);
-    }
-    return prixPharmacie;
   }
 }
