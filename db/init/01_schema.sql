@@ -45,16 +45,19 @@ CREATE TABLE clients (
 
 CREATE TABLE medicaments (
     id                    SERIAL PRIMARY KEY,
+    prix_défaut           INTEGER NOT NULL,
     nom                   VARCHAR(150) NOT NULL,
+    est_remboursable      BOOLEAN NOT NULL,
     categorie             VARCHAR(100),
     necessite_ordonnance  BOOLEAN NOT NULL DEFAULT false,
     cree_le               TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Stock : quantité disponible d'un médicament dans une pharmacie
+-- Stock : quantité disponible d'un médicament dans une pharmacie et le prix défini par la pharmacie (médicaments non remboursables uniquement)
 CREATE TABLE stocks (
     pharmacie_id    INTEGER NOT NULL REFERENCES pharmacies(id) ON DELETE CASCADE,
     medicament_id   INTEGER NOT NULL REFERENCES medicaments(id) ON DELETE CASCADE,
+    prix            INTEGER NOT NULL,
     quantite        INTEGER NOT NULL DEFAULT 0 CHECK (quantite >= 0),
     mis_a_jour_le   TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (pharmacie_id, medicament_id)
