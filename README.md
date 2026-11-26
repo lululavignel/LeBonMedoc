@@ -65,6 +65,7 @@ La requête « Créer une pharmacie » enregistre automatiquement l'id créé da
 | GET     | `/api/reservations/:id`    | Détail d'une réservation, avec ses lignes |
 | GET     | `/api/reservations/:id/lignes` | Lignes (médicaments) d'une réservation |
 | POST    | `/api/reservations`        | Création (`clientId`, `pharmacieId`, `lignes: [{ medicamentId, quantite }]` ≥ 1 ligne, `retraitLe`) |
+| POST    | `/api/reservations/:id/acceptation` | Accepte une réservation en attente (date limite de retrait fixée à J+3, `409` si transition interdite) |
 
 Les violations de contraintes en base renvoient `409` (doublon, ex. email déjà utilisé) ou `400` (référence inexistante).
 
