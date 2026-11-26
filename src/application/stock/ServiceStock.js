@@ -1,4 +1,5 @@
-import { ErreurIntrouvable, ErreurValidation } from '../erreurs.js';
+import { ErreurIntrouvable } from '../erreurs.js';
+import { Stock } from '../../modele/stock/Stock.js';
 
 export class ServiceStock {
   constructor(depotStock) {
@@ -18,18 +19,13 @@ export class ServiceStock {
   }
 
   creerStock(donnees) {
-    const manquants = ['pharmacieId', 'medicamentId'].filter((champ) => !donnees?.[champ]);
-    if (manquants.length) {
-      throw new ErreurValidation(`Champs obligatoires manquants : ${manquants.join(', ')}`);
-    }
-    for (const champ of ['pharmacieId', 'medicamentId']) {
-      if (!Number.isInteger(donnees[champ]) || donnees[champ] <= 0) {
-        throw new ErreurValidation(`${champ} doit être un entier positif`);
-      }
-    }
-    if (donnees.quantite !== undefined && (!Number.isInteger(donnees.quantite) || donnees.quantite < 0)) {
-      throw new ErreurValidation('quantite doit être un entier positif ou nul');
-    }
-    return this.depotStock.creer(donnees);
+    // Les invariants (identifiants, prix, quantité) sont garantis par le modèle Stock
+    const stock = new Stock({
+      pharmacieId: donnees?.pharmacieId,
+      medicamentId: donnees?.medicamentId,
+      prix: donnees?.prix,
+      quantite: donnees?.quantite,
+    });
+    return this.depotStock.creer(stock);
   }
 }

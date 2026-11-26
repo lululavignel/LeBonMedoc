@@ -1,6 +1,17 @@
 import { connexions } from '../bdd/connexion.js';
+import { Stock } from '../../modele/stock/Stock.js';
 
-const COLONNES = 'pharmacie_id, medicament_id, quantite, mis_a_jour_le';
+const COLONNES = 'pharmacie_id, medicament_id, prix, quantite, mis_a_jour_le';
+
+function versStock(ligne) {
+  return new Stock({
+    pharmacieId: ligne.pharmacie_id,
+    medicamentId: ligne.medicament_id,
+    prix: ligne.prix,
+    quantite: ligne.quantite,
+    misAJourLe: ligne.mis_a_jour_le,
+  });
+}
 
 // Un stock est identifié par le couple (pharmacie, médicament)
 export class DepotStockPg {
@@ -8,7 +19,7 @@ export class DepotStockPg {
     const { rows: lignes } = await connexions.query(
       `SELECT ${COLONNES} FROM stocks ORDER BY pharmacie_id, medicament_id`,
     );
-    return lignes;
+    return lignes.map(versStock);
   }
 
   async getById(pharmacieId, medicamentId) {
@@ -16,16 +27,16 @@ export class DepotStockPg {
       `SELECT ${COLONNES} FROM stocks WHERE pharmacie_id = $1 AND medicament_id = $2`,
       [pharmacieId, medicamentId],
     );
-    return lignes[0] ?? null;
+    return lignes[0] ? versStock(lignes[0]) : null;
   }
 
-  async creer({ pharmacieId, medicamentId, quantite = 0 }) {
+  async creer(stock) {
     const { rows: lignes } = await connexions.query(
-      `INSERT INTO stocks (pharmacie_id, medicament_id, quantite)
-       VALUES ($1, $2, $3)
+      `INSERT INTO stocks (pharmacie_id, medicament_id, prix, quantite)
+       VALUES ($1, $2, $3, $4)
        RETURNING ${COLONNES}`,
-      [pharmacieId, medicamentId, quantite],
+      [stock.pharmacieId, stock.medicamentId, stock.prix, stock.quantite],
     );
-    return lignes[0];
+    return versStock(lignes[0]);
   }
 }

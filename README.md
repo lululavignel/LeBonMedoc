@@ -60,7 +60,7 @@ La requête « Créer une pharmacie » enregistre automatiquement l'id créé da
 | POST    | `/api/medicaments`         | Création (`nom` obligatoire, `categorie`, `necessiteOrdonnance`) |
 | GET     | `/api/stocks`              | Liste des stocks                |
 | GET     | `/api/stocks/:pharmacieId/:medicamentId` | Stock d'un médicament dans une pharmacie |
-| POST    | `/api/stocks`              | Création (`pharmacieId`, `medicamentId` obligatoires, `quantite`) |
+| POST    | `/api/stocks`              | Création (`pharmacieId`, `medicamentId`, `prix` obligatoires, `quantite`) |
 | GET     | `/api/reservations`        | Liste des réservations          |
 | GET     | `/api/reservations/:id`    | Détail d'une réservation, avec ses lignes |
 | GET     | `/api/reservations/:id/lignes` | Lignes (médicaments) d'une réservation |

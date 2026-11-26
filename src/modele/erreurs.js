@@ -12,3 +12,5 @@ export class ErreurTransitionInterdite extends ErreurDomaine {}
 export class ErreurReservationExpiree extends ErreurDomaine {}
 
 export class ErreurMedicamentInvalide extends ErreurDomaine {}
+
+export class ErreurStockInvalide extends ErreurDomaine {}
