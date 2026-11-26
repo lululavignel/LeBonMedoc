@@ -10,17 +10,24 @@ export class ServiceStock {
     return this.depotStock.getAll();
   }
 
-  async obtenirStock(pharmacieId, medicamentId) {
-    const stock = await this.depotStock.getById(pharmacieId, medicamentId);
+  async obtenirStock(params) {
+    const stock = await this.depotStock.getById(params.pharmacieId, params.medicamentId);
     if (!stock) {
-      throw new ErreurIntrouvable(`Stock du médicament ${medicamentId} dans la pharmacie ${pharmacieId} introuvable`);
+      throw new ErreurIntrouvable(`Stock du médicament ${params.medicamentId} dans la pharmacie ${params.pharmacieId} introuvable`);
     }
     return stock;
   }
 
-  creerStock(donnees) {
-    // Les invariants (identifiants, prix, quantité) sont garantis par le modèle Stock
-    const stock = Stock.creer(donnees ?? {});
+  creerStock(parametresJson) {
+    // Les invariants (identifiants, prix, quantité) sont garantis par le modèle Stock -> modèle enrichi
+    const stock = Stock.creer(parametresJson ?? {});
     return this.depotStock.creer(stock);
+  }
+
+  modifierStock(identifiants, modifications){
+    const stock = await this.obtenirStock(identifiants);
+    const { prix, quantite } = modifications
+    stock = stock.modifier(modifications)
+    this.depotStock.modifier(stock)
   }
 }

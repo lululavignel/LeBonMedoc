@@ -22,14 +22,8 @@ export class Stock {
         throw new ErreurStockInvalide(`${champ} doit être un entier positif`);
       }
     }
-    // Un prix doit être un entier positif ou nul
-    if (!Number.isInteger(prix) || prix < 0) {
-      throw new ErreurStockInvalide(`Prix invalide : ${JSON.stringify(prix)}`);
-    }
-    // Une quantité doit être un entier positif ou nul
-    if (!Number.isInteger(quantite) || quantite < 0) {
-      throw new ErreurStockInvalide(`Quantité invalide : ${JSON.stringify(quantite)}`);
-    }
+    Stock.#verifierPrix(prix);
+    Stock.#verifierQuantite(quantite);
     if (misAJourLe !== null && Number.isNaN(new Date(misAJourLe).getTime())) {
       throw new ErreurStockInvalide('misAJourLe doit être une date valide');
     }
@@ -41,9 +35,54 @@ export class Stock {
     this.#misAJourLe = misAJourLe !== null ? new Date(misAJourLe) : null;
   }
 
+  // Un prix doit être un entier positif ou nul
+  static #verifierPrix(prix) {
+    if (!Number.isInteger(prix) || prix < 0) {
+      throw new ErreurStockInvalide(`Prix invalide : ${JSON.stringify(prix)}`);
+    }
+  }
+
+  // Une quantité doit être un entier positif ou nul
+  static #verifierQuantite(quantite) {
+    if (!Number.isInteger(quantite) || quantite < 0) {
+      throw new ErreurStockInvalide(`Quantité invalide : ${JSON.stringify(quantite)}`);
+    }
+  }
+
   get pharmacieId() { return this.#pharmacieId; }
   get medicamentId() { return this.#medicamentId; }
   get prix() { return this.#prix; }
   get quantite() { return this.#quantite; }
   get misAJourLe() { return this.#misAJourLe ? new Date(this.#misAJourLe) : null; }
+
+  // Représentation sérialisable du stock
+  toJSON() {
+    return {
+      pharmacieId: this.#pharmacieId,
+      medicamentId: this.#medicamentId,
+      prix: this.#prix,
+      quantite: this.#quantite,
+      misAJourLe: this.#misAJourLe ? this.#misAJourLe.toISOString() : null,
+    };
+  }
+
+  modifier(modifications) {
+    if (modifications === null || typeof modifications !== 'object' || Array.isArray(modifications)) {
+      throw new ErreurStockInvalide('Les modifications doivent être un objet { prix?, quantite? }');
+    }
+    const { prix, quantite } = modifications;
+    if (prix === undefined && quantite === undefined) {
+      throw new ErreurStockInvalide('Aucune modification : fournir au moins prix ou quantite');
+    }
+    if (prix !== undefined) Stock.#verifierPrix(prix);
+    if (quantite !== undefined) Stock.#verifierQuantite(quantite);
+
+    return new Stock({
+      pharmacieId: this.#pharmacieId,
+      medicamentId: this.#medicamentId,
+      prix: prix ?? this.#prix,
+      quantite: quantite ?? this.#quantite,
+      misAJourLe: this.#misAJourLe,
+    });
+  }
 }

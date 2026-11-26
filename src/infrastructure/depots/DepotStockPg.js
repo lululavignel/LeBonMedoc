@@ -39,4 +39,14 @@ export class DepotStockPg {
     );
     return versStock(lignes[0]);
   }
+
+  async modifier(stock) {
+    const { rows: lignes } = await connexions.query(
+      `UPDATE stocks SET prix = $3, quantite = $4, mis_a_jour_le = now()
+      WHERE pharmacie_id = $1 AND medicament_id = $2
+      RETURNING ${COLONNES}`,
+      [stock.pharmacieId, stock.medicamentId, stock.prix, stock.quantite],
+    );
+    return versStock(lignes[0]);
+  }
 }
