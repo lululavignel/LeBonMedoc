@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { Reservation } from '../../../src/domaine/reservation/Reservation.js';
-import { StatutReservation } from '../../../src/domaine/reservation/StatutReservation.js';
-import { ErreurReservationExpiree, ErreurTransitionInterdite } from '../../../src/domaine/erreurs.js';
+import { Reservation } from '../../../src/modele/reservation/Reservation.js';
+import { StatutReservation } from '../../../src/modele/reservation/StatutReservation.js';
+import { ErreurReservationExpiree, ErreurTransitionInterdite } from '../../../src/modele/erreurs.js';
 
 const maintenant = new Date('2026-01-01T10:00:00Z');
 const dansQuatreJours = new Date('2026-01-05T10:00:00Z');
