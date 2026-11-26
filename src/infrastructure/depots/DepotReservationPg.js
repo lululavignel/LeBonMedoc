@@ -1,5 +1,5 @@
 import { connexions } from '../bdd/connexion.js';
-import { Reservation } from '../../domaine/reservation/Reservation.js';
+import { Reservation } from '../../modele/reservation/Reservation.js';
 
 const COLONNES = 'id, client_id, pharmacie_id, statut, retrait_le, expire_le, cree_le, mis_a_jour_le';
 const COLONNES_LIGNE = 'reservation_id, medicament_id, quantite';
