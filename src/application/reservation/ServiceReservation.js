@@ -1,4 +1,5 @@
-import { ErreurIntrouvable, ErreurValidation } from '../erreurs.js';
+import { ErreurIntrouvable } from '../erreurs.js';
+import { Reservation } from '../../modele/reservation/Reservation.js';
 
 export class ServiceReservation {
   constructor(depotReservation) {
@@ -16,76 +17,40 @@ export class ServiceReservation {
   }
 
   async listerLignesReservation(id) {
-    await this.obtenirReservationParId(id);
-    return this.depotReservation.getLignes(id);
+    const reservation = await this.obtenirReservationParId(id);
+    return reservation.lignes;
   }
 
   async accepterReservation(id) {
-    const reservation = await this.#chargerReservation(id);
+    const reservation = await this.obtenirReservationParId(id);
     reservation.accepter(new Date());
     await this.depotReservation.miseAJourDeLetat(reservation);
-    return this.obtenirReservationParId(id);
+    return reservation;
   }
 
   async refuserReservation(id) {
-    const reservation = await this.#chargerReservation(id);
+    const reservation = await this.obtenirReservationParId(id);
     reservation.refuser();
     await this.depotReservation.miseAJourDeLetat(reservation);
-    return this.obtenirReservationParId(id);
+    return reservation;
   }
 
   async annulerReservation(id) {
-    const reservation = await this.#chargerReservation(id);
+    const reservation = await this.obtenirReservationParId(id);
     reservation.annuler();
     await this.depotReservation.miseAJourDeLetat(reservation);
-    return this.obtenirReservationParId(id);
+    return reservation;
   }
 
   async terminerReservation(id) {
-    const reservation = await this.#chargerReservation(id);
+    const reservation = await this.obtenirReservationParId(id);
     reservation.terminer(new Date());
     await this.depotReservation.miseAJourDeLetat(reservation);
-    return this.obtenirReservationParId(id);
-  }
-
-  async #chargerReservation(id) {
-    const reservation = await this.depotReservation.getReservation(id);
-    if (!reservation) throw new ErreurIntrouvable(`Réservation ${id} introuvable`);
     return reservation;
   }
 
   creerReservation(donnees) {
-    const manquants = ['clientId', 'pharmacieId', 'lignes'].filter((champ) => !donnees?.[champ]);
-    if (manquants.length) {
-      throw new ErreurValidation(`Champs obligatoires manquants : ${manquants.join(', ')}`);
-    }
-    for (const champ of ['clientId', 'pharmacieId']) {
-      if (!Number.isInteger(donnees[champ]) || donnees[champ] <= 0) {
-        throw new ErreurValidation(`${champ} doit être un entier positif`);
-      }
-    }
-
-    // Règle du domaine : une réservation contient au moins un médicament
-    if (!Array.isArray(donnees.lignes) || donnees.lignes.length === 0) {
-      throw new ErreurValidation('Une réservation doit contenir au moins un médicament');
-    }
-    const medicaments = new Set();
-    for (const { medicamentId, quantite } of donnees.lignes) {
-      if (!Number.isInteger(medicamentId) || medicamentId <= 0) {
-        throw new ErreurValidation('Chaque ligne doit avoir un medicamentId entier positif');
-      }
-      if (!Number.isInteger(quantite) || quantite <= 0) {
-        throw new ErreurValidation('Chaque ligne doit avoir une quantite entière strictement positive');
-      }
-      if (medicaments.has(medicamentId)) {
-        throw new ErreurValidation(`Le médicament ${medicamentId} apparaît plusieurs fois`);
-      }
-      medicaments.add(medicamentId);
-    }
-
-    if (donnees.retraitLe !== undefined && Number.isNaN(Date.parse(donnees.retraitLe))) {
-      throw new ErreurValidation('retraitLe doit être une date valide');
-    }
-    return this.depotReservation.creer(donnees);
+    const reservation = Reservation.creer(donnees ?? {});
+    return this.depotReservation.creer(reservation);
   }
 }

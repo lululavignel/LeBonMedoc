@@ -3,14 +3,40 @@ import assert from 'node:assert/strict';
 
 import { Reservation } from '../../../src/modele/reservation/Reservation.js';
 import { StatutReservation } from '../../../src/modele/reservation/StatutReservation.js';
-import { ErreurReservationExpiree, ErreurTransitionInterdite } from '../../../src/modele/erreurs.js';
+import { ErreurReservationExpiree, ErreurReservationInvalide, ErreurTransitionInterdite } from '../../../src/modele/erreurs.js';
 
 const maintenant = new Date('2026-01-01T10:00:00Z');
 const dansQuatreJours = new Date('2026-01-05T10:00:00Z');
 
+const donneesValides = { clientId: 1, pharmacieId: 2, lignes: [{ medicamentId: 3, quantite: 1 }] };
+
 function reservationEnAttente() {
-  return new Reservation({ id: 1, statut: StatutReservation.EN_ATTENTE });
+  return Reservation.creer(donneesValides);
 }
+
+test('créer une réservation la place en attente avec ses lignes', () => {
+  const reservation = Reservation.creer(donneesValides);
+
+  assert.equal(reservation.statut, StatutReservation.EN_ATTENTE);
+  assert.equal(reservation.lignes.length, 1);
+  assert.equal(reservation.lignes[0].medicamentId, 3);
+});
+
+test('impossible de créer une réservation sans médicament', () => {
+  assert.throws(() => Reservation.creer({ ...donneesValides, lignes: [] }), ErreurReservationInvalide);
+});
+
+test('impossible de demander deux fois le même médicament', () => {
+  const lignes = [{ medicamentId: 3, quantite: 1 }, { medicamentId: 3, quantite: 2 }];
+
+  assert.throws(() => Reservation.creer({ ...donneesValides, lignes }), ErreurReservationInvalide);
+});
+
+test('impossible de créer une ligne avec une quantité nulle', () => {
+  const lignes = [{ medicamentId: 3, quantite: 0 }];
+
+  assert.throws(() => Reservation.creer({ ...donneesValides, lignes }), ErreurReservationInvalide);
+});
 
 function reservationAcceptee() {
   const reservation = reservationEnAttente();

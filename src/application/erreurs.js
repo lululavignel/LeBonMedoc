@@ -17,3 +17,9 @@ export class ErreurIntrouvable extends ErreurApplication {
     super(message, 404);
   }
 }
+
+export class ErreurConflit extends ErreurApplication {
+  constructor(message) {
+    super(message, 409);
+  }
+}
