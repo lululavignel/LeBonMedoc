@@ -1,4 +1,5 @@
-import { ErreurIntrouvable, ErreurValidation } from '../erreurs.js';
+import { ErreurIntrouvable } from '../erreurs.js';
+import { Medicament } from '../../modele/medicament/Medicament.js';
 
 export class ServiceMedicament {
   constructor(depotMedicament) {
@@ -16,12 +17,7 @@ export class ServiceMedicament {
   }
 
   creerMedicament(donnees) {
-    if (!donnees?.nom) {
-      throw new ErreurValidation('Champs obligatoires manquants : nom');
-    }
-    if (donnees.necessiteOrdonnance !== undefined && typeof donnees.necessiteOrdonnance !== 'boolean') {
-      throw new ErreurValidation('necessiteOrdonnance doit être un booléen');
-    }
-    return this.depotMedicament.creer(donnees);
+    const medicament = new Medicament(donnees ?? {});
+    return this.depotMedicament.creer(medicament);
   }
 }

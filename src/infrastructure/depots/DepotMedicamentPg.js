@@ -1,6 +1,6 @@
 import { connexions } from '../bdd/connexion.js';
 
-const COLONNES = 'id, nom, categorie, necessite_ordonnance, cree_le';
+const COLONNES = 'id, nom, prix_defaut, est_remboursable, categorie, necessite_ordonnance, cree_le';
 
 export class DepotMedicamentPg {
   async getAll() {
@@ -13,12 +13,18 @@ export class DepotMedicamentPg {
     return lignes[0] ?? null;
   }
 
-  async creer({ nom, categorie = null, necessiteOrdonnance = false }) {
+  async creer(medicament) {
     const { rows: lignes } = await connexions.query(
-      `INSERT INTO medicaments (nom, categorie, necessite_ordonnance)
-       VALUES ($1, $2, $3)
+      `INSERT INTO medicaments (nom, prix_defaut, est_remboursable, categorie, necessite_ordonnance)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING ${COLONNES}`,
-      [nom, categorie, necessiteOrdonnance],
+      [
+        medicament.nom,
+        medicament.prixDefaut,
+        medicament.estRemboursable,
+        medicament.categorie,
+        medicament.necessiteOrdonnance,
+      ],
     );
     return lignes[0];
   }
