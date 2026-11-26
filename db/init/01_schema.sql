@@ -45,7 +45,7 @@ CREATE TABLE clients (
 
 CREATE TABLE medicaments (
     id                    SERIAL PRIMARY KEY,
-    prix_défaut           INTEGER NOT NULL,
+    prix_defaut           INTEGER NOT NULL,
     nom                   VARCHAR(150) NOT NULL,
     est_remboursable      BOOLEAN NOT NULL,
     categorie             VARCHAR(100),
