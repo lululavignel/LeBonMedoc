@@ -20,12 +20,7 @@ export class ServiceStock {
 
   creerStock(donnees) {
     // Les invariants (identifiants, prix, quantité) sont garantis par le modèle Stock
-    const stock = new Stock({
-      pharmacieId: donnees?.pharmacieId,
-      medicamentId: donnees?.medicamentId,
-      prix: donnees?.prix,
-      quantite: donnees?.quantite,
-    });
+    const stock = Stock.creer(donnees ?? {});
     return this.depotStock.creer(stock);
   }
 }
