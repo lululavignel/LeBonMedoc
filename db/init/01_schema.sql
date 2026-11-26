@@ -57,7 +57,7 @@ CREATE TABLE medicaments (
 CREATE TABLE stocks (
     pharmacie_id    INTEGER NOT NULL REFERENCES pharmacies(id) ON DELETE CASCADE,
     medicament_id   INTEGER NOT NULL REFERENCES medicaments(id) ON DELETE CASCADE,
-    prix            INTEGER,
+    prix            INTEGER NOT NULL,
     quantite        INTEGER NOT NULL DEFAULT 0 CHECK (quantite >= 0),
     mis_a_jour_le   TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (pharmacie_id, medicament_id)
