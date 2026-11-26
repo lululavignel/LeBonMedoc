@@ -66,7 +66,12 @@ La requête « Créer une pharmacie » enregistre automatiquement l'id créé da
 | GET     | `/api/reservations/:id/lignes` | Lignes (médicaments) d'une réservation |
 | POST    | `/api/reservations`        | Création (`clientId`, `pharmacieId`, `lignes: [{ medicamentId, quantite }]` ≥ 1 ligne, `retraitLe`) |
 | POST    | `/api/reservations/:id/acceptation` | Accepte une réservation en attente (date limite de retrait fixée à J+3, `409` si transition interdite) |
+| POST    | `/api/reservations/:id/refus` | Refuse une réservation en attente |
+| POST    | `/api/reservations/:id/annulation` | Annule une réservation acceptée |
+| POST    | `/api/reservations/:id/retrait` | Le pharmacien délivre une réservation acceptée et non échue (passe à `TERMINEE`) |
 
+Une transition d'état interdite (ex. accepter une réservation déjà refusée) ou un retrait après la date limite renvoie `409`.
+Les autres règles métier violées renvoient `400`.
 Les violations de contraintes en base renvoient `409` (doublon, ex. email déjà utilisé) ou `400` (référence inexistante).
 
 ## Architecture (couches DDD)

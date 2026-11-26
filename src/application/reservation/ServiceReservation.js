@@ -27,6 +27,27 @@ export class ServiceReservation {
     return this.obtenirReservationParId(id);
   }
 
+  async refuserReservation(id) {
+    const reservation = await this.#chargerReservation(id);
+    reservation.refuser();
+    await this.depotReservation.miseAJourDeLetat(reservation);
+    return this.obtenirReservationParId(id);
+  }
+
+  async annulerReservation(id) {
+    const reservation = await this.#chargerReservation(id);
+    reservation.annuler();
+    await this.depotReservation.miseAJourDeLetat(reservation);
+    return this.obtenirReservationParId(id);
+  }
+
+  async terminerReservation(id) {
+    const reservation = await this.#chargerReservation(id);
+    reservation.terminer(new Date());
+    await this.depotReservation.miseAJourDeLetat(reservation);
+    return this.obtenirReservationParId(id);
+  }
+
   async #chargerReservation(id) {
     const reservation = await this.depotReservation.getReservation(id);
     if (!reservation) throw new ErreurIntrouvable(`Réservation ${id} introuvable`);

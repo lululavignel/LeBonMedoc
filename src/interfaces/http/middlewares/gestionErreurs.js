@@ -1,5 +1,9 @@
 import { ErreurApplication } from '../../../application/erreurs.js';
-import { ErreurDomaine } from '../../../modele/erreurs.js';
+import {
+  ErreurDomaine,
+  ErreurReservationExpiree,
+  ErreurTransitionInterdite,
+} from '../../../modele/erreurs.js';
 
 export function gestionnaireRouteIntrouvable(requete, reponse) {
   reponse.status(404).json({ erreur: `Route ${requete.method} ${requete.originalUrl} introuvable` });
@@ -9,6 +13,9 @@ export function gestionnaireRouteIntrouvable(requete, reponse) {
 export function gestionnaireErreurs(erreur, _requete, reponse, _suivant) {
   if (erreur instanceof ErreurApplication) {
     return reponse.status(erreur.statut).json({ erreur: erreur.message });
+  }
+  if (erreur instanceof ErreurTransitionInterdite || erreur instanceof ErreurReservationExpiree) {
+    return reponse.status(409).json({ erreur: erreur.message });
   }
   if (erreur instanceof ErreurDomaine) {
     return reponse.status(400).json({ erreur: erreur.message });

@@ -31,5 +31,17 @@ export function routeurReservations(serviceReservation) {
     reponse.json(await serviceReservation.accepterReservation(lireId(requete)));
   });
 
+  routeur.post('/:id/refus', async (requete, reponse) => {
+    reponse.json(await serviceReservation.refuserReservation(lireId(requete)));
+  });
+
+  routeur.post('/:id/annulation', async (requete, reponse) => {
+    reponse.json(await serviceReservation.annulerReservation(lireId(requete)));
+  });
+
+  routeur.post('/:id/retrait', async (requete, reponse) => {
+    reponse.json(await serviceReservation.terminerReservation(lireId(requete)));
+  });
+
   return routeur;
 }
