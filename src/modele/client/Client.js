@@ -28,19 +28,12 @@ export class Client {
         'Le numéro de sécurité sociale doit comporter 15 chiffres',
       );
     }
-    if (typeof email !== 'string' || !FORMAT_EMAIL.test(email.trim())) {
-      throw new ErreurClientInvalide(`Email invalide : ${JSON.stringify(email)}`);
-    }
-    if (telephone !== null && (typeof telephone !== 'string' || telephone.trim() === '')) {
-      throw new ErreurClientInvalide(`Téléphone invalide : ${JSON.stringify(telephone)}`);
-    }
-
     this.#id = id;
     this.#nom = nom.trim();
     this.#prenom = prenom.trim();
     this.#numeroSecuriteSociale = numero;
-    this.#email = email.trim().toLowerCase();
-    this.#telephone = telephone === null ? null : telephone.trim();
+    this.#email = Client.#validerEmail(email);
+    this.#telephone = Client.#validerTelephone(telephone);
   }
 
   get id() { return this.#id; }
@@ -49,4 +42,27 @@ export class Client {
   get numeroSecuriteSociale() { return this.#numeroSecuriteSociale; }
   get email() { return this.#email; }
   get telephone() { return this.#telephone; }
+
+  changerEmail(email) {
+    this.#email = Client.#validerEmail(email);
+  }
+
+  changerTelephone(telephone) {
+    this.#telephone = Client.#validerTelephone(telephone);
+  }
+
+  static #validerEmail(email) {
+    if (typeof email !== 'string' || !FORMAT_EMAIL.test(email.trim())) {
+      throw new ErreurClientInvalide(`Email invalide : ${JSON.stringify(email)}`);
+    }
+    return email.trim().toLowerCase();
+  }
+
+  static #validerTelephone(telephone) {
+    if (telephone === null) return null;
+    if (typeof telephone !== 'string' || telephone.trim() === '') {
+      throw new ErreurClientInvalide(`Téléphone invalide : ${JSON.stringify(telephone)}`);
+    }
+    return telephone.trim();
+  }
 }

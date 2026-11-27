@@ -24,17 +24,6 @@ export class Reservation {
         throw new ErreurReservationInvalide(`${champ} doit être un entier positif`);
       }
     }
-    if (!Array.isArray(lignes) || lignes.length === 0) {
-      throw new ErreurReservationInvalide('Une réservation doit contenir au moins un médicament');
-    }
-    const lignesReservation = lignes.map((ligne) => (ligne instanceof LigneReservation ? ligne : new LigneReservation(ligne ?? {})));
-    const medicaments = new Set();
-    for (const { medicamentId } of lignesReservation) {
-      if (medicaments.has(medicamentId)) {
-        throw new ErreurReservationInvalide(`Le médicament ${medicamentId} apparaît plusieurs fois`);
-      }
-      medicaments.add(medicamentId);
-    }
     if (!Object.values(StatutReservation).includes(statut)) {
       throw new ErreurReservationInvalide(`Statut de réservation inconnu : ${JSON.stringify(statut)}`);
     }
@@ -48,7 +37,7 @@ export class Reservation {
     this.#id = id;
     this.#clientId = clientId;
     this.#pharmacieId = pharmacieId;
-    this.#lignes = lignesReservation;
+    this.#lignes = Reservation.#validerLignes(lignes);
     this.#statut = statut;
     this.#retraitLe = retraitLe !== null ? new Date(retraitLe) : null;
     this.#expireLe = expireLe ? new Date(expireLe) : null;
@@ -96,6 +85,21 @@ export class Reservation {
 
   estEchue(maintenant) {
     return this.#statut === StatutReservation.ACCEPTEE && maintenant.getTime() >= this.#expireLe.getTime();
+  }
+
+  static #validerLignes(lignes) {
+    if (!Array.isArray(lignes) || lignes.length === 0) {
+      throw new ErreurReservationInvalide('Une réservation doit contenir au moins un médicament');
+    }
+    const lignesReservation = lignes.map((ligne) => (ligne instanceof LigneReservation ? ligne : new LigneReservation(ligne ?? {})));
+    const medicaments = new Set();
+    for (const { medicamentId } of lignesReservation) {
+      if (medicaments.has(medicamentId)) {
+        throw new ErreurReservationInvalide(`Le médicament ${medicamentId} apparaît plusieurs fois`);
+      }
+      medicaments.add(medicamentId);
+    }
+    return lignesReservation;
   }
 
   #verifierTransitionVers(statutCible) {
