@@ -1,12 +1,10 @@
-import { ErreurClientInvalide, ErreurNumeroSecuriteSocialeInvalide } from '../erreurs.js';
-
-const FORMAT_NUMERO_SECURITE_SOCIALE = /^\d{15}$/;
-const FORMAT_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { ErreurClientInvalide } from '../erreurs.js';
+import { Email } from '../commun/Email.js';
+import { Telephone } from '../commun/Telephone.js';
+import { NumeroSecuriteSociale } from './NumeroSecuriteSociale.js';
 
 const LONGUEUR_MAX_NOM = 100;
 const LONGUEUR_MAX_PRENOM = 100;
-const LONGUEUR_MAX_EMAIL = 255;
-const LONGUEUR_MAX_TELEPHONE = 30;
 
 export class Client {
   #id;
@@ -25,9 +23,9 @@ export class Client {
     this.#definirId(id);
     this.#nom = Client.#validerTexte('nom', nom, LONGUEUR_MAX_NOM);
     this.#prenom = Client.#validerTexte('prenom', prenom, LONGUEUR_MAX_PRENOM);
-    this.#definirNumeroSecuriteSociale(numeroSecuriteSociale);
-    this.#email = Client.#validerEmail(email);
-    this.#telephone = Client.#validerTelephone(telephone);
+    this.#numeroSecuriteSociale = new NumeroSecuriteSociale(numeroSecuriteSociale);
+    this.#email = new Email(email);
+    this.#telephone = telephone === null ? null : new Telephone(telephone);
     this.#definirCreeLe(creeLe);
   }
 
@@ -36,18 +34,6 @@ export class Client {
       throw new ErreurClientInvalide('id doit être un entier positif');
     }
     this.#id = id;
-  }
-
-  #definirNumeroSecuriteSociale(numeroSecuriteSociale) {
-    const numero = typeof numeroSecuriteSociale === 'string'
-      ? numeroSecuriteSociale.replace(/\s/g, '')
-      : numeroSecuriteSociale;
-    if (typeof numero !== 'string' || !FORMAT_NUMERO_SECURITE_SOCIALE.test(numero)) {
-      throw new ErreurNumeroSecuriteSocialeInvalide(
-        'Le numéro de sécurité sociale doit comporter 15 chiffres',
-      );
-    }
-    this.#numeroSecuriteSociale = numero;
   }
 
   #definirCreeLe(creeLe) {
@@ -66,23 +52,11 @@ export class Client {
   get creeLe() { return this.#creeLe ? new Date(this.#creeLe) : null; }
 
   changerEmail(email) {
-    this.#email = Client.#validerEmail(email);
+    this.#email = new Email(email);
   }
 
   changerTelephone(telephone) {
-    this.#telephone = Client.#validerTelephone(telephone);
-  }
-
-  toJSON() {
-    return {
-      id: this.#id,
-      nom: this.#nom,
-      prenom: this.#prenom,
-      numeroSecuriteSociale: this.#numeroSecuriteSociale,
-      email: this.#email,
-      telephone: this.#telephone,
-      creeLe: this.#creeLe ? this.#creeLe.toISOString() : null,
-    };
+    this.#telephone = telephone === null ? null : new Telephone(telephone);
   }
 
   static #validerTexte(champ, valeur, longueurMax) {
@@ -93,26 +67,5 @@ export class Client {
       throw new ErreurClientInvalide(`Le ${champ} du client ne doit pas dépasser ${longueurMax} caractères`);
     }
     return valeur.trim();
-  }
-
-  static #validerEmail(email) {
-    if (typeof email !== 'string' || !FORMAT_EMAIL.test(email.trim())) {
-      throw new ErreurClientInvalide(`Email invalide : ${JSON.stringify(email)}`);
-    }
-    if (email.trim().length > LONGUEUR_MAX_EMAIL) {
-      throw new ErreurClientInvalide(`L'email ne doit pas dépasser ${LONGUEUR_MAX_EMAIL} caractères`);
-    }
-    return email.trim().toLowerCase();
-  }
-
-  static #validerTelephone(telephone) {
-    if (telephone === null) return null;
-    if (typeof telephone !== 'string' || telephone.trim() === '') {
-      throw new ErreurClientInvalide(`Téléphone invalide : ${JSON.stringify(telephone)}`);
-    }
-    if (telephone.trim().length > LONGUEUR_MAX_TELEPHONE) {
-      throw new ErreurClientInvalide(`Le téléphone ne doit pas dépasser ${LONGUEUR_MAX_TELEPHONE} caractères`);
-    }
-    return telephone.trim();
   }
 }

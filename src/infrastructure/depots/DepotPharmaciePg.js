@@ -34,8 +34,8 @@ export class DepotPharmaciePg {
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING ${COLONNES}`,
       [
-        pharmacie.nom, pharmacie.adresse, pharmacie.ville, pharmacie.codePostal,
-        pharmacie.telephone, pharmacie.email, pharmacie.horaires,
+        pharmacie.nom, pharmacie.adresse, pharmacie.ville, pharmacie.codePostal.valeur,
+        pharmacie.telephone?.valeur ?? null, pharmacie.email?.valeur ?? null, pharmacie.horaires,
       ],
     );
     return versPharmacie(lignes[0]);

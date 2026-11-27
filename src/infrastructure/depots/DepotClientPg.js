@@ -31,7 +31,7 @@ export class DepotClientPg {
       `INSERT INTO clients (nom, prenom, numero_securite_sociale, email, telephone)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING ${COLONNES}`,
-      [client.nom, client.prenom, client.numeroSecuriteSociale, client.email, client.telephone],
+      [client.nom, client.prenom, client.numeroSecuriteSociale.valeur, client.email.valeur, client.telephone?.valeur ?? null],
     );
     return versClient(lignes[0]);
   }

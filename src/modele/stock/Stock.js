@@ -85,17 +85,6 @@ export class Stock {
   get quantite() { return this.#quantite; }
   get misAJourLe() { return this.#misAJourLe ? new Date(this.#misAJourLe) : null; }
 
-  // Représentation sérialisable du stock
-  toJSON() {
-    return {
-      pharmacieId: this.#pharmacieId,
-      medicamentId: this.#medicamentId,
-      prix: this.#prix,
-      quantite: this.#quantite,
-      misAJourLe: this.#misAJourLe ? this.#misAJourLe.toISOString() : null,
-    };
-  }
-
   // Le médicament associé est requis dès que le prix est modifié
   modifier(modifications, medicament = null) {
     if (modifications === null || typeof modifications !== 'object' || Array.isArray(modifications)) {

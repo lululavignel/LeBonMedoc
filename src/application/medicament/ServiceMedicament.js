@@ -17,7 +17,7 @@ export class ServiceMedicament {
   }
 
   creerMedicament(donnees) {
-    const medicament = new Medicament(donnees ?? {});
+    const medicament = Medicament.creer(donnees ?? {});
     return this.depotMedicament.creer(medicament);
   }
 }

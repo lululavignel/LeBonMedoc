@@ -22,3 +22,7 @@ export class ErreurClientInvalide extends ErreurDomaine {}
 export class ErreurPharmacieInvalide extends ErreurDomaine {}
 
 export class ErreurCodePostalInvalide extends ErreurDomaine {}
+
+export class ErreurEmailInvalide extends ErreurDomaine {}
+
+export class ErreurTelephoneInvalide extends ErreurDomaine {}

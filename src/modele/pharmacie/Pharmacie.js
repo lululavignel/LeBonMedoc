@@ -1,13 +1,11 @@
-import { ErreurCodePostalInvalide, ErreurPharmacieInvalide } from '../erreurs.js';
-
-const FORMAT_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const FORMAT_CODE_POSTAL = /^\d{5}$/;
+import { ErreurPharmacieInvalide } from '../erreurs.js';
+import { Email } from '../commun/Email.js';
+import { Telephone } from '../commun/Telephone.js';
+import { CodePostal } from './CodePostal.js';
 
 const LONGUEUR_MAX_NOM = 150;
 const LONGUEUR_MAX_ADRESSE = 255;
 const LONGUEUR_MAX_VILLE = 100;
-const LONGUEUR_MAX_EMAIL = 255;
-const LONGUEUR_MAX_TELEPHONE = 30;
 
 export class Pharmacie {
   #id;
@@ -31,9 +29,9 @@ export class Pharmacie {
     this.#nom = Pharmacie.#validerTexte('nom', nom, LONGUEUR_MAX_NOM);
     this.#adresse = Pharmacie.#validerTexte('adresse', adresse, LONGUEUR_MAX_ADRESSE);
     this.#ville = Pharmacie.#validerTexte('ville', ville, LONGUEUR_MAX_VILLE);
-    this.#codePostal = Pharmacie.#validerCodePostal(codePostal);
-    this.#telephone = Pharmacie.#validerTelephone(telephone);
-    this.#email = Pharmacie.#validerEmail(email);
+    this.#codePostal = new CodePostal(codePostal);
+    this.#telephone = telephone === null ? null : new Telephone(telephone);
+    this.#email = email === null ? null : new Email(email);
     this.#horaires = Pharmacie.#validerHoraires(horaires);
     this.#definirCreeLe(creeLe);
   }
@@ -63,25 +61,11 @@ export class Pharmacie {
   get creeLe() { return this.#creeLe ? new Date(this.#creeLe) : null; }
 
   changerEmail(email) {
-    this.#email = Pharmacie.#validerEmail(email);
+    this.#email = email === null ? null : new Email(email);
   }
 
   changerTelephone(telephone) {
-    this.#telephone = Pharmacie.#validerTelephone(telephone);
-  }
-
-  toJSON() {
-    return {
-      id: this.#id,
-      nom: this.#nom,
-      adresse: this.#adresse,
-      ville: this.#ville,
-      codePostal: this.#codePostal,
-      telephone: this.#telephone,
-      email: this.#email,
-      horaires: structuredClone(this.#horaires),
-      creeLe: this.#creeLe ? this.#creeLe.toISOString() : null,
-    };
+    this.#telephone = telephone === null ? null : new Telephone(telephone);
   }
 
   static #validerTexte(champ, valeur, longueurMax) {
@@ -92,36 +76,6 @@ export class Pharmacie {
       throw new ErreurPharmacieInvalide(`Le champ ${champ} de la pharmacie ne doit pas dépasser ${longueurMax} caractères`);
     }
     return valeur.trim();
-  }
-
-  static #validerCodePostal(codePostal) {
-    const code = typeof codePostal === 'string' ? codePostal.replace(/\s/g, '') : codePostal;
-    if (typeof code !== 'string' || !FORMAT_CODE_POSTAL.test(code)) {
-      throw new ErreurCodePostalInvalide('Le code postal doit comporter 5 chiffres');
-    }
-    return code;
-  }
-
-  static #validerEmail(email) {
-    if (email === null) return null;
-    if (typeof email !== 'string' || !FORMAT_EMAIL.test(email.trim())) {
-      throw new ErreurPharmacieInvalide(`Email invalide : ${JSON.stringify(email)}`);
-    }
-    if (email.trim().length > LONGUEUR_MAX_EMAIL) {
-      throw new ErreurPharmacieInvalide(`L'email ne doit pas dépasser ${LONGUEUR_MAX_EMAIL} caractères`);
-    }
-    return email.trim().toLowerCase();
-  }
-
-  static #validerTelephone(telephone) {
-    if (telephone === null) return null;
-    if (typeof telephone !== 'string' || telephone.trim() === '') {
-      throw new ErreurPharmacieInvalide(`Téléphone invalide : ${JSON.stringify(telephone)}`);
-    }
-    if (telephone.trim().length > LONGUEUR_MAX_TELEPHONE) {
-      throw new ErreurPharmacieInvalide(`Le téléphone ne doit pas dépasser ${LONGUEUR_MAX_TELEPHONE} caractères`);
-    }
-    return telephone.trim();
   }
 
   static #validerHoraires(horaires) {

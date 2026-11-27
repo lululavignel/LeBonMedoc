@@ -8,6 +8,10 @@ export class Medicament {
   #categorie;
   #necessiteOrdonnance;
 
+  static creer({ nom, prixDefaut, estRemboursable, categorie = null, necessiteOrdonnance = false }) {
+    return new Medicament({ id: null, nom, prixDefaut, estRemboursable, categorie, necessiteOrdonnance });
+  }
+
   constructor({ id, nom, prixDefaut, estRemboursable, categorie = null, necessiteOrdonnance = false }) {
     this.#definirId(id);
     this.#definirNom(nom);
@@ -17,12 +21,13 @@ export class Medicament {
     this.#definirCategorie(categorie);
   }
 
-  // L'id est nul tant que le médicament n'est pas persisté (il est généré par la base)
+  // L'id est nul tant que le médicament n'est pas persisté (il est généré par la base) ;
+  // il doit être fourni explicitement : un id absent est refusé
   #definirId(nouvelId) {
-    if (nouvelId !== null && nouvelId !== undefined && (!Number.isInteger(nouvelId) || nouvelId <= 0)) {
-      throw new ErreurMedicamentInvalide('id doit être un entier positif');
+    if (nouvelId !== null && (!Number.isInteger(nouvelId) || nouvelId <= 0)) {
+      throw new ErreurMedicamentInvalide('id doit être un entier positif, ou nul avant persistance');
     }
-    this.#id = nouvelId ?? null;
+    this.#id = nouvelId;
   }
 
   // Le nom est obligatoire et stocké sans espaces superflus
