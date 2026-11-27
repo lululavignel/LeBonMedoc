@@ -1,4 +1,5 @@
-import { ErreurIntrouvable, ErreurValidation } from '../erreurs.js';
+import { ErreurIntrouvable } from '../erreurs.js';
+import { Pharmacie } from '../../modele/pharmacie/Pharmacie.js';
 
 export class ServicePharmacie {
   constructor(depotPharmacie) {
@@ -16,12 +17,7 @@ export class ServicePharmacie {
   }
 
   creerPharmacie(donnees) {
-    const manquants = ['nom', 'adresse', 'ville', 'codePostal'].filter((champ) => !donnees?.[champ]);
-    if (manquants.length) {
-      throw new ErreurValidation(`Champs obligatoires manquants : ${manquants.join(', ')}`);
-    }
-    return this.depotPharmacie.creer(donnees);
+    const pharmacie = Pharmacie.creer(donnees ?? {});
+    return this.depotPharmacie.creer(pharmacie);
   }
-
-
 }

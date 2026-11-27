@@ -18,3 +18,7 @@ export class ErreurStockInvalide extends ErreurDomaine {}
 export class ErreurNumeroSecuriteSocialeInvalide extends ErreurDomaine {}
 
 export class ErreurClientInvalide extends ErreurDomaine {}
+
+export class ErreurPharmacieInvalide extends ErreurDomaine {}
+
+export class ErreurCodePostalInvalide extends ErreurDomaine {}
