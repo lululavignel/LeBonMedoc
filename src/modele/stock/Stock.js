@@ -16,37 +16,50 @@ export class Stock {
   // Reconstitution d'un stock existant (utilisé par le dépôt)
   constructor({ pharmacieId, medicamentId, prix, quantite = 0, misAJourLe = null }) {
     // Validation des paramètres au plus proche de la donnée (modèle riche)
-    // Un identifiant doit être un entier strictement positif
-    for (const [champ, valeur] of [['pharmacieId', pharmacieId], ['medicamentId', medicamentId]]) {
-      if (!Number.isInteger(valeur) || valeur <= 0) {
-        throw new ErreurStockInvalide(`${champ} doit être un entier positif`);
-      }
-    }
-    Stock.#verifierPrix(prix);
-    Stock.#verifierQuantite(quantite);
-    if (misAJourLe !== null && Number.isNaN(new Date(misAJourLe).getTime())) {
+    this.#definirPharmacieId(pharmacieId);
+    this.#definirMedicamentId(medicamentId);
+    this.#definirMisAJourLe(misAJourLe);
+    this.#definirPrix(prix);
+    this.#definirQuantite(quantite);
+  }
+
+  // La date de mise à jour est nulle tant que le stock n'est pas persisté, sinon une date valide
+  #definirMisAJourLe(nouvelleDate) {
+    if (nouvelleDate !== null && Number.isNaN(new Date(nouvelleDate).getTime())) {
       throw new ErreurStockInvalide('misAJourLe doit être une date valide');
     }
+    this.#misAJourLe = nouvelleDate !== null ? new Date(nouvelleDate) : null;
+  }
 
-    this.#pharmacieId = pharmacieId;
-    this.#medicamentId = medicamentId;
-    this.#prix = prix;
-    this.#quantite = quantite;
-    this.#misAJourLe = misAJourLe !== null ? new Date(misAJourLe) : null;
+  // Un identifiant doit être un entier strictement positif
+  #definirPharmacieId(nouvelId) {
+    if (!Number.isInteger(nouvelId) || nouvelId <= 0) {
+      throw new ErreurStockInvalide('pharmacieId doit être un entier positif');
+    }
+    this.#pharmacieId = nouvelId;
+  }
+
+  #definirMedicamentId(nouvelId) {
+    if (!Number.isInteger(nouvelId) || nouvelId <= 0) {
+      throw new ErreurStockInvalide('medicamentId doit être un entier positif');
+    }
+    this.#medicamentId = nouvelId;
   }
 
   // Un prix doit être un entier positif ou nul
-  static #verifierPrix(prix) {
-    if (!Number.isInteger(prix) || prix < 0) {
-      throw new ErreurStockInvalide(`Prix invalide : ${JSON.stringify(prix)}`);
+  #definirPrix(nouveauPrix) {
+    if (!Number.isInteger(nouveauPrix) || nouveauPrix < 0) {
+      throw new ErreurStockInvalide(`Prix invalide : ${JSON.stringify(nouveauPrix)}`);
     }
+    this.#prix = nouveauPrix;
   }
 
   // Une quantité doit être un entier positif ou nul
-  static #verifierQuantite(quantite) {
-    if (!Number.isInteger(quantite) || quantite < 0) {
-      throw new ErreurStockInvalide(`Quantité invalide : ${JSON.stringify(quantite)}`);
+  #definirQuantite(nouvelleQuantite) {
+    if (!Number.isInteger(nouvelleQuantite) || nouvelleQuantite < 0) {
+      throw new ErreurStockInvalide(`Quantité invalide : ${JSON.stringify(nouvelleQuantite)}`);
     }
+    this.#quantite = nouvelleQuantite;
   }
 
   get pharmacieId() { return this.#pharmacieId; }
@@ -74,14 +87,12 @@ export class Stock {
     if (prix === undefined && quantite === undefined) {
       throw new ErreurStockInvalide('Aucune modification : fournir au moins prix ou quantite');
     }
-    if (prix !== undefined) Stock.#verifierPrix(prix);
-    if (quantite !== undefined) Stock.#verifierQuantite(quantite);
-
+    // Le stock est immuable : on renvoie un nouveau Stock, dont le constructeur valide prix et quantite
     return new Stock({
       pharmacieId: this.#pharmacieId,
       medicamentId: this.#medicamentId,
-      prix: prix ?? this.#prix,
-      quantite: quantite ?? this.#quantite,
+      prix: prix !== undefined ? prix : this.#prix,
+      quantite: quantite !== undefined ? quantite : this.#quantite,
       misAJourLe: this.#misAJourLe,
     });
   }
