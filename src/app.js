@@ -33,7 +33,7 @@ export function creerApplication() {
   const servicePharmacien = new ServicePharmacien(new DepotPharmacienPg());
   const serviceClient = new ServiceClient(new DepotClientPg());
   const serviceMedicament = new ServiceMedicament(new DepotMedicamentPg());
-  const serviceStock = new ServiceStock(new DepotStockPg());
+  const serviceStock = new ServiceStock(new DepotStockPg(), new DepotMedicamentPg());
   const serviceReservation = new ServiceReservation(new DepotReservationPg());
 
   application.get('/', (_requete, reponse) => reponse.json({ nom: 'LeBonMédoc API', version: '0.1.0' }));

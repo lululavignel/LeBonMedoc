@@ -1,4 +1,5 @@
 import { ErreurStockInvalide } from '../erreurs.js';
+import { Medicament } from '../medicament/Medicament.js';
 
 // Un stock est identifié par le couple (pharmacie, médicament)
 export class Stock {
@@ -8,19 +9,24 @@ export class Stock {
   #quantite;
   #misAJourLe;
 
-  // Création d'un nouveau stock (pas encore persisté : misAJourLe est fixé par la base)
-  static creer({ pharmacieId, medicamentId, prix, quantite = 0 }) {
-    return new Stock({ pharmacieId, medicamentId, prix, quantite, misAJourLe: null });
-  }
-
-  // Reconstitution d'un stock existant (utilisé par le dépôt)
-  constructor({ pharmacieId, medicamentId, prix, quantite = 0, misAJourLe = null }) {
+  // Reconstitution d'un stock existant (utilisé par le dépôt, sans médicament :
+  // les données venant de la base ont déjà été validées à leur écriture)
+  constructor({ pharmacieId, medicamentId, prix, quantite = 0, misAJourLe = null }, medicament = null) {
     // Validation des paramètres au plus proche de la donnée (modèle riche)
     this.#definirPharmacieId(pharmacieId);
     this.#definirMedicamentId(medicamentId);
     this.#definirMisAJourLe(misAJourLe);
-    this.#definirPrix(prix);
+    this.#definirPrixVente(prix, medicament);
     this.#definirQuantite(quantite);
+  }
+
+  // Création d'un nouveau stock (pas encore persisté : misAJourLe est fixé par la base).
+  // Le médicament associé est requis pour vérifier les règles de prix de vente.
+  static creer({ pharmacieId, medicamentId, prix, quantite = 0 }, medicament) {
+    if (!medicament) {
+      throw new ErreurStockInvalide('Le médicament est requis pour créer un stock');
+    }
+    return new Stock({ pharmacieId, medicamentId, prix, quantite, misAJourLe: null }, medicament);
   }
 
   // La date de mise à jour est nulle tant que le stock n'est pas persisté, sinon une date valide
@@ -46,12 +52,23 @@ export class Stock {
     this.#medicamentId = nouvelId;
   }
 
-  // Un prix doit être un entier positif ou nul
-  #definirPrix(nouveauPrix) {
-    if (!Number.isInteger(nouveauPrix) || nouveauPrix < 0) {
-      throw new ErreurStockInvalide(`Prix invalide : ${JSON.stringify(nouveauPrix)}`);
+  // Un prix de vente doit être un entier positif ou nul.
+  // Si le médicament est fourni, un médicament remboursable doit être vendu à son prix par défaut.
+  #definirPrixVente(prixVente, medicament) {
+    if (!Number.isInteger(prixVente) || prixVente < 0) {
+      throw new ErreurStockInvalide(`Prix de vente invalide : ${JSON.stringify(prixVente)}`);
     }
-    this.#prix = nouveauPrix;
+    if (medicament !== null) {
+      if (!(medicament instanceof Medicament) || medicament.id !== this.#medicamentId) {
+        throw new ErreurStockInvalide(`Le médicament fourni ne correspond pas au medicamentId ${this.#medicamentId}`);
+      }
+      if (medicament.estRemboursable && prixVente !== medicament.prixDefaut) {
+        throw new ErreurStockInvalide(
+          `Un médicament remboursable doit être vendu à son prix par défaut (${medicament.prixDefaut}), pas ${prixVente}`,
+        );
+      }
+    }
+    this.#prix = prixVente;
   }
 
   // Une quantité doit être un entier positif ou nul
@@ -79,13 +96,17 @@ export class Stock {
     };
   }
 
-  modifier(modifications) {
+  // Le médicament associé est requis dès que le prix est modifié
+  modifier(modifications, medicament = null) {
     if (modifications === null || typeof modifications !== 'object' || Array.isArray(modifications)) {
       throw new ErreurStockInvalide('Les modifications doivent être un objet { prix?, quantite? }');
     }
     const { prix, quantite } = modifications;
     if (prix === undefined && quantite === undefined) {
       throw new ErreurStockInvalide('Aucune modification : fournir au moins prix ou quantite');
+    }
+    if (prix !== undefined && medicament === null) {
+      throw new ErreurStockInvalide('Le médicament est requis pour modifier le prix de vente');
     }
     // Le stock est immuable : on renvoie un nouveau Stock, dont le constructeur valide prix et quantite
     return new Stock({
@@ -94,6 +115,6 @@ export class Stock {
       prix: prix !== undefined ? prix : this.#prix,
       quantite: quantite !== undefined ? quantite : this.#quantite,
       misAJourLe: this.#misAJourLe,
-    });
+    }, medicament);
   }
 }

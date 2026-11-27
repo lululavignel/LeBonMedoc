@@ -9,28 +9,58 @@ export class Medicament {
   #necessiteOrdonnance;
 
   constructor({ id, nom, prixDefaut, estRemboursable, categorie = null, necessiteOrdonnance = false }) {
-    if (typeof nom !== 'string' || nom.trim() === '') {
+    this.#definirId(id);
+    this.#definirNom(nom);
+    this.#definirPrixDefaut(prixDefaut);
+    this.#definirEstRemboursable(estRemboursable);
+    this.#definirNecessiteOrdonnance(necessiteOrdonnance);
+    this.#definirCategorie(categorie);
+  }
+
+  // L'id est nul tant que le médicament n'est pas persisté (il est généré par la base)
+  #definirId(nouvelId) {
+    if (nouvelId !== null && nouvelId !== undefined && (!Number.isInteger(nouvelId) || nouvelId <= 0)) {
+      throw new ErreurMedicamentInvalide('id doit être un entier positif');
+    }
+    this.#id = nouvelId ?? null;
+  }
+
+  // Le nom est obligatoire et stocké sans espaces superflus
+  #definirNom(nouveauNom) {
+    if (typeof nouveauNom !== 'string' || nouveauNom.trim() === '') {
       throw new ErreurMedicamentInvalide('Le nom du médicament est obligatoire');
     }
-    if (!Number.isInteger(prixDefaut) || prixDefaut < 0) {
-      throw new ErreurMedicamentInvalide(`Prix par défaut invalide : ${JSON.stringify(prixDefaut)}`);
+    this.#nom = nouveauNom.trim();
+  }
+
+  // Un prix doit être un entier positif ou nul
+  #definirPrixDefaut(nouveauPrix) {
+    if (!Number.isInteger(nouveauPrix) || nouveauPrix < 0) {
+      throw new ErreurMedicamentInvalide(`Prix par défaut invalide : ${JSON.stringify(nouveauPrix)}`);
     }
-    if (typeof estRemboursable !== 'boolean') {
+    this.#prixDefaut = nouveauPrix;
+  }
+
+  #definirEstRemboursable(remboursable) {
+    if (typeof remboursable !== 'boolean') {
       throw new ErreurMedicamentInvalide('estRemboursable doit être un booléen');
     }
-    if (typeof necessiteOrdonnance !== 'boolean') {
+    this.#estRemboursable = remboursable;
+  }
+
+  #definirNecessiteOrdonnance(ordonnanceRequise) {
+    if (typeof ordonnanceRequise !== 'boolean') {
       throw new ErreurMedicamentInvalide('necessiteOrdonnance doit être un booléen');
     }
-    if (categorie !== null && typeof categorie !== 'string') {
+    this.#necessiteOrdonnance = ordonnanceRequise;
+  }
+
+  // La catégorie est facultative
+  #definirCategorie(nouvelleCategorie) {
+    if (nouvelleCategorie !== null && typeof nouvelleCategorie !== 'string') {
       throw new ErreurMedicamentInvalide('La catégorie doit être une chaîne de caractères');
     }
-
-    this.#id = id;
-    this.#nom = nom.trim();
-    this.#prixDefaut = prixDefaut;
-    this.#estRemboursable = estRemboursable;
-    this.#categorie = categorie;
-    this.#necessiteOrdonnance = necessiteOrdonnance;
+    this.#categorie = nouvelleCategorie;
   }
 
   get id() { return this.#id; }
@@ -39,15 +69,4 @@ export class Medicament {
   get estRemboursable() { return this.#estRemboursable; }
   get categorie() { return this.#categorie; }
   get necessiteOrdonnance() { return this.#necessiteOrdonnance; }
-
-  verifierPrixVente(prixVente) {
-    if (!Number.isInteger(prixVente) || prixVente < 0) {
-      throw new ErreurMedicamentInvalide(`Prix de vente invalide : ${JSON.stringify(prixVente)}`);
-    }
-    if (this.#estRemboursable && prixVente !== this.#prixDefaut) {
-      throw new ErreurMedicamentInvalide(
-        `Un médicament remboursable doit être vendu à son prix par défaut (${this.#prixDefaut}), pas ${prixVente}`,
-      );
-    }
-  }
 }
