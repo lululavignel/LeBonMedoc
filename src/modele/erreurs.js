@@ -14,3 +14,7 @@ export class ErreurReservationExpiree extends ErreurDomaine {}
 export class ErreurMedicamentInvalide extends ErreurDomaine {}
 
 export class ErreurStockInvalide extends ErreurDomaine {}
+
+export class ErreurNumeroSecuriteSocialeInvalide extends ErreurDomaine {}
+
+export class ErreurClientInvalide extends ErreurDomaine {}
